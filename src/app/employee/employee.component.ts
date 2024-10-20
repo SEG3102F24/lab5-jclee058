@@ -2,6 +2,7 @@ import { AbstractControl, FormBuilder, Validators, ReactiveFormsModule } from "@
 import {EmployeeService} from "../service/employee.service";
 import { Router, RouterLink } from "@angular/router";
 import {Employee} from "../model/employee";
+import { EmployeeDbService } from "../employees/firestore/employee-db.service";
 import {Component, EventEmitter, Input, OnInit, Output, inject} from '@angular/core';
 @Component({
     selector: 'app-employee',
@@ -10,10 +11,11 @@ import {Component, EventEmitter, Input, OnInit, Output, inject} from '@angular/c
     standalone: true,
     imports: [RouterLink, ReactiveFormsModule]
 })
-export class EmployeeComponent {
+export class EmployeeComponent{
   @Output() fireSave: EventEmitter<Employee> = new EventEmitter();
   private builder: FormBuilder = inject(FormBuilder);
   private employeeService: EmployeeService = inject(EmployeeService);
+  private employeeDbService: EmployeeDbService = inject(EmployeeDbService);
   private router: Router = inject(Router);
   employeeForm = this.builder.group({
     name: ['', Validators.required],
@@ -38,9 +40,10 @@ export class EmployeeComponent {
       this.salary.value,
       this.gender.value,
       this.email.value);
+    this.fireSave.emit(employee);
+    this.employeeDbService.createEmployee(employee);
     this.employeeService.addEmployee(employee);
     this.employeeForm.reset();
-    this.fireSave.emit(employee)
     this.router.navigate(['/employees']).then(() => {});
   }
 }
