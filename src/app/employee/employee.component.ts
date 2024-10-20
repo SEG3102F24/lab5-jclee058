@@ -1,9 +1,8 @@
-import {Component, inject} from '@angular/core';
 import { AbstractControl, FormBuilder, Validators, ReactiveFormsModule } from "@angular/forms";
 import {EmployeeService} from "../service/employee.service";
 import { Router, RouterLink } from "@angular/router";
 import {Employee} from "../model/employee";
-
+import {Component, EventEmitter, Input, OnInit, Output, inject} from '@angular/core';
 @Component({
     selector: 'app-employee',
     templateUrl: './employee.component.html',
@@ -12,6 +11,7 @@ import {Employee} from "../model/employee";
     imports: [RouterLink, ReactiveFormsModule]
 })
 export class EmployeeComponent {
+  @Output() fireSave: EventEmitter<Employee> = new EventEmitter();
   private builder: FormBuilder = inject(FormBuilder);
   private employeeService: EmployeeService = inject(EmployeeService);
   private router: Router = inject(Router);
@@ -40,6 +40,7 @@ export class EmployeeComponent {
       this.email.value);
     this.employeeService.addEmployee(employee);
     this.employeeForm.reset();
+    this.fireSave.emit(employee)
     this.router.navigate(['/employees']).then(() => {});
   }
 }
